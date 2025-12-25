@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>music · 手机端布局</title>
+    <title>墨白音乐盒</title>
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
     <style>
         :root{
@@ -197,7 +197,7 @@
         function toggleFav(){if(!state.current)return;const idx=state.favorites.findIndex(t=>t.uid===state.current.uid);if(idx>=0){state.favorites.splice(idx,1);toast('已取消收藏');}else{state.favorites.push(state.current);toast('已收藏');}updateUI();}
         function nextTrack(dir){const tab=document.querySelector('.tab.active').dataset.tab;let list=[];if(tab==='results')list=state.results;else if(tab==='favorites')list=state.favorites;else{const pl=state.playlists.find(p=>p.id===(state.playContext.playlistId||''));list=pl?pl.tracks:[];}if(!list.length)return;let idx=list.findIndex(t=>t.uid===state.current.uid);if(idx<0)idx=0;if(state.mode==='single'){$('audio').currentTime=0;$('audio').play();return;}if(state.mode==='shuffle'){if(list.length===1)idx=0;else{let n;do{n=Math.floor(Math.random()*list.length);}while(n===idx);idx=n;}}else{idx=(idx+(dir==='prev'?-1:1)+list.length)%list.length;}playTrack(list[idx]);}
         function setup(){
-            dom.audio=$('audio');dom.searchInput=$('searchInput');dom.playBtn=$('playBtn');dom.prevBtn=$('prevBtn');dom.nextBtn=$('nextBtn');dom.favBtn=$('favBtn');dom.progressBar=$('progressBar');dom.lyricsMask=$('lyricsMask');dom.lyricsPanel=$('lyricsPanel');dom.lyricsScroll=$('lyricsScroll');wrap=dom.lyricsScroll;
+            dom.audio=$('audio');dom.searchInput=$('searchInput');dom.playBtn=$('playBtn');dom.prevBtn=$('prevBtn');dom.nextBtn=$('nextBtn');dom.favBtn=$('favBtn');dom.progressBar=$('progressBar');dom.lyricsMask=$('lyricsMask');dom.lyricsPanel=$('lyricsPanel');dom.lyricsScroll=$('lyricsScroll');wrap=dom.lyricsScroll;dom.lyricsClose=$('lyricsClose');
             dom.searchInput.addEventListener('keydown',e=>{if(e.key==='Enter'){state.keyword=dom.searchInput.value.trim();searchAll(true);}});
             $('searchIcon').addEventListener('click',()=>{state.keyword=dom.searchInput.value.trim();searchAll(true);});
             document.querySelectorAll('.sourcebar input').forEach(cb=>cb.addEventListener('change',()=>{state.enabledSources[cb.dataset.src]=cb.checked;}));
@@ -207,7 +207,10 @@
             dom.audio.addEventListener('timeupdate',()=>{const cur=dom.audio.currentTime||0;const dur=dom.audio.duration||0;dom.progressBar.style.transform='scaleX('+(dur?cur/dur:0)+')';updateLyrics(cur);});
             dom.audio.addEventListener('ended',()=>nextTrack('next'));dom.audio.addEventListener('play',()=>{state.playing=true;updateUI();});dom.audio.addEventListener('pause',()=>{state.playing=false;updateUI();});
             document.querySelector('.player').addEventListener('click',()=>{dom.lyricsMask.style.display='block';dom.lyricsPanel.classList.add('show');});
-            dom.lyricsClose.addEventListener('click',()=>{dom.lyricsMask.style.display='none';dom.lyricsPanel.classList.remove('show');});dom.lyricsMask.addEventListener('click',()=>dom.lyricsClose.click());
+            dom.lyricsClose.addEventListener('click',()=>{dom.lyricsMask.style.display='none';dom.lyricsPanel.classList.remove('show');});dom.lyricsMask.addEventListener('click',()=>{
+    dom.lyricsMask.style.display='none';
+    dom.lyricsPanel.classList.remove('show');
+});
             renderList();
         }
         document.addEventListener('DOMContentLoaded',setup);
