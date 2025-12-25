@@ -52,9 +52,12 @@
         .sourcebar .sources{display:flex;gap:8px;}
         .sourcebar label{display:flex;align-items:center;gap:4px;}
         .sourcebar input{margin:0;width:12px;height:12px;accent-color:var(--accent);}
-        .sourcebar .limit-wrapper{display:flex;align-items:center;gap:6px;}
-        .sourcebar .quality-wrapper{display:flex;align-items:center;gap:6px;}
-        .sourcebar select{background:#000;color:var(--text-main);border:1px solid var(--border);border-radius:8px;padding:3px 6px;font-size:11px;outline:none;}
+        
+        /* 设置选项条 */
+        .settingsbar{flex-shrink:0;display:flex;gap:16px;padding:8px 16px;background:var(--panel);border-bottom:1px solid var(--border);font-size:12px;color:var(--text-sub);justify-content:center;align-items:center;}
+        .settingsbar .limit-wrapper{display:flex;align-items:center;gap:6px;}
+        .settingsbar .quality-wrapper{display:flex;align-items:center;gap:6px;}
+        .settingsbar select{background:#000;color:var(--text-main);border:1px solid var(--border);border-radius:8px;padding:3px 6px;font-size:11px;outline:none;}
         .sourcebar select option[value="standard"]{color:#4caf50;}
         .sourcebar select option[value="high"]{color:#4dd0e1;}
         .sourcebar select option[value="lossless"]{color:#ffb74d;}
@@ -205,7 +208,7 @@
             justify-content:center;
             padding:40px;
         }
-        
+
         @media (min-width: 768px) {
             .full-player-cover {
                 justify-content: center;
@@ -743,6 +746,10 @@
             <label><input type="checkbox" data-src="qq">QQ</label>
             <label><input type="checkbox" data-src="kuwo">酷我</label>
         </div>
+    </div>
+    
+    <!-- 设置选项 -->
+    <div class="settingsbar">
         <div class="limit-wrapper">
             <span>数量:</span>
             <select id="limitSelect">
@@ -855,7 +862,7 @@
     <div class="full-player-actions">
         <button id="fullDownloadBtn" class="action-btn">⬇</button>
         <button id="fullLyricsBtn" class="action-btn">词</button>
-        <button id="fullVolumeBtn" class="action-btn">🔊</button>
+        <button id="fullMuteBtn" class="action-btn">🔊</button>
         <button id="fullListBtn" class="action-btn">☰</button>
     </div>
 
@@ -1121,7 +1128,7 @@
             state.lyricIndex=-1;
             $('lyricsScroll').innerHTML='<div style="margin-top:30px;color:var(--text-sub)">加载中...</div>';
             $('inlineLyrics').innerHTML='';
-            
+
             try {
                 await ensureDetail(track);
                 if(!track.url){toast('播放失败');updateUI();return;}
@@ -1224,16 +1231,16 @@
             document.querySelectorAll('#lyricsScroll div').forEach((el,i)=>el.classList.toggle('active',i===idx));
             const active=$('lyricsScroll').querySelector('.active');
             if(active)active.scrollIntoView({block:'center',behavior:'smooth'});
-            
+
             // 同时更新内联歌词
             updateInlineLyrics(time);
         }
-        
+
         function renderInlineLyrics(){
             const wrap=$('inlineLyrics');
             const container=document.querySelector('.lyrics-container');
             if(!wrap || !container) return;
-            
+
             // 只在PC端显示歌词容器
             if(window.innerWidth >= 768 && state.lyrics.length > 0) {
                 container.style.display = 'block';
@@ -1249,7 +1256,7 @@
                 container.style.display = 'none';
             }
         }
-        
+
         function updateInlineLyrics(time){
             if(!state.lyrics.length||!$('inlineLyrics')||window.innerWidth < 768)return;
             let idx=state.lyrics.findIndex((l,i)=>{
@@ -1408,8 +1415,8 @@
                 document.querySelector('.playlist-batch-controls').classList.remove('show');
             });
 
-            dom.fullVolumeBtn.addEventListener('click',()=>{$('volumePanel').style.display='flex';updateVolumeDisplay();});
-            dom.fullProgressWrapper.addEventListener('click',e=>{const rect=dom.fullProgressWrapper.getBoundingClientRect();const r=(e.clientX-rect.left)/rect.width;const dur=dom.audio.duration||0;dom.audio.currentTime=Math.max(0,Math.min(dur,dur*r));});
+            $('fullMuteBtn').addEventListener('click',()=>{state.muted=!state.muted;dom.audio.muted=state.muted;$('fullMuteBtn').textContent=state.muted?'🔇':'🔊';toast(state.muted?'已静音':'已取消静音');});
+            dom.fullProgressWrapper.addEventListener('click',e=>{if(!fullProgressDragging){const rect=dom.fullProgressWrapper.getBoundingClientRect();const r=(e.clientX-rect.left)/rect.width;const dur=dom.audio.duration||0;dom.audio.currentTime=Math.max(0,Math.min(dur,dur*r));}});
 
             // 歌词和音量面板
             $('lyricsBackBtn').addEventListener('click', hideLyrics);
@@ -1447,14 +1454,22 @@
                 lyricsIsDragging = false;
             });
             $('volumeBackBtn').addEventListener('click',()=>{$('volumePanel').style.display='none';});
-            $('volumeSlider').addEventListener('input',()=>{const vol=parseFloat($('volumeSlider').value);dom.audio.volume=vol;state.volume=vol;saveData();updateVolumeDisplay();});
-            $('muteBtn').addEventListener('click',()=>{state.muted=!state.muted;dom.audio.muted=state.muted;$('muteBtn').textContent=state.muted?'🔇':'🔊';});
-            document.querySelectorAll('.volume-preset').forEach(btn=>btn.addEventListener('click',()=>{const vol=parseFloat(btn.dataset.volume);dom.audio.volume=vol;state.volume=vol;saveData();$('volumeSlider').value=vol;updateVolumeDisplay();}));
+            document.querySelectorAll('.volume-preset').forEach(btn=>btn.addEventListener('click',()=>{const vol=parseFloat(btn.dataset.volume);dom.audio.volume=vol;state.volume=vol;saveData();}));
             $('jumpPrev').onclick=()=>{if(state.lyricIndex>0){dom.audio.currentTime=state.lyrics[state.lyricIndex-1].time+.1;}};
             $('jumpNext').onclick=()=>{if(state.lyricIndex<state.lyrics.length-1){dom.audio.currentTime=state.lyrics[state.lyricIndex+1].time+.1;}};
             $('lyricsStyleBtn').onclick=()=>{state.lyricsAlt=!state.lyricsAlt;$('lyricsScroll').classList.toggle('alt-style',state.lyricsAlt);toast('歌词样式已切换');};
 
-            dom.progressWrapper.addEventListener('click',e=>{const rect=dom.progressWrapper.getBoundingClientRect();const r=(e.clientX-rect.left)/rect.width;const dur=dom.audio.duration||0;dom.audio.currentTime=Math.max(0,Math.min(dur,dur*r));});
+            // 进度条拖动功能
+            let progressDragging = false;
+            let fullProgressDragging = false;
+            
+            dom.progressWrapper.addEventListener('mousedown',e=>{progressDragging=true;const rect=dom.progressWrapper.getBoundingClientRect();const r=(e.clientX-rect.left)/rect.width;const dur=dom.audio.duration||0;dom.audio.currentTime=Math.max(0,Math.min(dur,dur*r));});
+            document.addEventListener('mousemove',e=>{if(progressDragging){const rect=dom.progressWrapper.getBoundingClientRect();const r=Math.max(0,Math.min(1,(e.clientX-rect.left)/rect.width));const dur=dom.audio.duration||0;dom.audio.currentTime=dur*r;}});
+            document.addEventListener('mouseup',()=>{progressDragging=false;});
+            
+            dom.fullProgressWrapper.addEventListener('mousedown',e=>{fullProgressDragging=true;const rect=dom.fullProgressWrapper.getBoundingClientRect();const r=(e.clientX-rect.left)/rect.width;const dur=dom.audio.duration||0;dom.audio.currentTime=Math.max(0,Math.min(dur,dur*r));});
+            document.addEventListener('mousemove',e=>{if(fullProgressDragging){const rect=dom.fullProgressWrapper.getBoundingClientRect();const r=Math.max(0,Math.min(1,(e.clientX-rect.left)/rect.width));const dur=dom.audio.duration||0;dom.audio.currentTime=dur*r;}});
+            document.addEventListener('mouseup',()=>{fullProgressDragging=false;});
             dom.audio.addEventListener('timeupdate',()=>{const cur=dom.audio.currentTime||0;const dur=dom.audio.duration||0;const r=dur?cur/dur:0;dom.progressBar.style.transform='scaleX('+r+')';const w=dom.progressWrapper.clientWidth;dom.progressHandle.style.left=(w*r)+'px';if(dom.fullProgressBar){dom.fullProgressBar.style.transform='scaleX('+r+')';const fw=dom.fullProgressWrapper.clientWidth;dom.fullProgressHandle.style.left=(fw*r)+'px';}if($('currentTime'))$('currentTime').textContent=fmt(cur);if($('totalTime'))$('totalTime').textContent=fmt(dur);updateLyrics(cur);});
             dom.audio.addEventListener('ended',()=>nextTrack('next'));dom.audio.addEventListener('play',()=>{state.playing=true;updateUI();if(dom.fullCover)dom.fullCover.classList.remove('paused');});dom.audio.addEventListener('pause',()=>{state.playing=false;updateUI();if(dom.fullCover)dom.fullCover.classList.add('paused');});
 
@@ -1563,7 +1578,7 @@
             window.addEventListener('resize', () => {
                 renderInlineLyrics();
             });
-            
+
             // 歌词区域鼠标滚动支持
             const lyricsContainer = document.querySelector('.lyrics-container');
             if(lyricsContainer) {
@@ -1582,10 +1597,9 @@
             $('limitSelect').value=state.perLimit;
             $('qualitySelect').value=state.quality;
             dom.audio.volume=state.volume;
-            $('volumeSlider').value=state.volume;
+            $('fullMuteBtn').textContent=state.muted?'🔇':'🔊';
             updateModeUI();
-            updateVolumeDisplay();
-            
+
             loadDefault();
         }
         document.addEventListener('DOMContentLoaded',setup);
