@@ -778,9 +778,6 @@
         </div>
         <div class="cover-wrapper">
             <img id="cover" class="cover" style="display:none">
-            <div class="play-overlay">
-                <button id="playBtn">▶</button>
-            </div>
         </div>
         <div class="info">
             <div id="title" class="title">暂未选择歌曲</div>
@@ -1127,7 +1124,7 @@
                 updateUI();
             }
         }
-        function updateUI(){const tr=state.current;$('title').textContent=tr?tr.title:'暂未选择歌曲';const artistText=tr?tr.singer:'点击选择音乐';const qualityText=tr?state.quality==='lossless'?'无损':state.quality==='high'?'高品质':'标准':'';const qualityClass=tr?`quality-${state.quality}`:'';$('artist').innerHTML=tr?`${artistText} <span class="quality-tag ${qualityClass}">${qualityText}</span>`:artistText;if($('fullTitle'))$('fullTitle').textContent=tr?tr.title:'--';if($('fullArtist'))$('fullArtist').innerHTML=tr?`${tr.singer} <span class="full-quality-tag full-${qualityClass}">${qualityText}</span>`:'--';if($('fullTitlePC'))$('fullTitlePC').textContent=tr?tr.title:'--';if($('fullArtistPC'))$('fullArtistPC').innerHTML=tr?`${tr.singer} <span class="full-quality-tag full-${qualityClass}">${qualityText}</span>`:'--';const cover=tr&&tr.cover?tr.cover:'';$('cover').src=cover;$('cover').style.display=tr&&tr.cover?'block':'none';if($('fullCover'))$('fullCover').src=cover||'';$('playBtn').textContent=state.playing?'⏸':'▶';$('playPauseBtn').textContent=state.playing?'⏸':'▶';if($('fullPlayBtn'))$('fullPlayBtn').textContent=state.playing?'⏸':'▶';if($('lyricsPlayBtn'))$('lyricsPlayBtn').textContent=state.playing?'⏸':'▶';const isFav=tr&&state.favorites.find(f=>f.uid===tr.uid);if($('fullFavBtn'))$('fullFavBtn').style.color=isFav?'#ff6b6b':'var(--text-main)';$('favBtn').style.color=isFav?'#ff6b6b':'var(--text-main)';document.querySelectorAll('.track').forEach(el=>{const uid=state.current?state.current.uid:null;const list=[...state.results,...state.favorites,...state.history];const track=list.find(t=>t.uid===uid);el.classList.toggle('playing',track&&el.querySelector('.playbtn').onclick.toString().includes(track.uid));});document.querySelectorAll('.playbtn').forEach(btn=>{const trackRow=btn.closest('.track');if(trackRow){const isCurrentTrack=state.current&&trackRow.querySelector('.title').textContent===state.current.title;btn.textContent=isCurrentTrack&&state.playing?'⏸':'▶';}});$('player').classList.toggle('show',!!tr);}
+        function updateUI(){const tr=state.current;$('title').textContent=tr?tr.title:'暂未选择歌曲';const artistText=tr?tr.singer:'点击选择音乐';const qualityText=tr?state.quality==='lossless'?'无损':state.quality==='high'?'高品质':'标准':'';const qualityClass=tr?`quality-${state.quality}`:'';$('artist').innerHTML=tr?`${artistText} <span class="quality-tag ${qualityClass}">${qualityText}</span>`:artistText;if($('fullTitle'))$('fullTitle').textContent=tr?tr.title:'--';if($('fullArtist'))$('fullArtist').innerHTML=tr?`${tr.singer} <span class="full-quality-tag full-${qualityClass}">${qualityText}</span>`:'--';if($('fullTitlePC'))$('fullTitlePC').textContent=tr?tr.title:'--';if($('fullArtistPC'))$('fullArtistPC').innerHTML=tr?`${tr.singer} <span class="full-quality-tag full-${qualityClass}">${qualityText}</span>`:'--';const cover=tr&&tr.cover?tr.cover:'';$('cover').src=cover;$('cover').style.display=tr&&tr.cover?'block':'none';if($('fullCover'))$('fullCover').src=cover||'';$('playPauseBtn').textContent=state.playing?'⏸':'▶';if($('fullPlayBtn'))$('fullPlayBtn').textContent=state.playing?'⏸':'▶';if($('lyricsPlayBtn'))$('lyricsPlayBtn').textContent=state.playing?'⏸':'▶';const isFav=tr&&state.favorites.find(f=>f.uid===tr.uid);if($('fullFavBtn'))$('fullFavBtn').style.color=isFav?'#ff6b6b':'var(--text-main)';$('favBtn').style.color=isFav?'#ff6b6b':'var(--text-main)';document.querySelectorAll('.track').forEach(el=>{const uid=state.current?state.current.uid:null;const list=[...state.results,...state.favorites,...state.history];const track=list.find(t=>t.uid===uid);el.classList.toggle('playing',track&&el.querySelector('.playbtn').onclick.toString().includes(track.uid));});document.querySelectorAll('.playbtn').forEach(btn=>{const trackRow=btn.closest('.track');if(trackRow){const isCurrentTrack=state.current&&trackRow.querySelector('.title').textContent===state.current.title;btn.textContent=isCurrentTrack&&state.playing?'⏸':'▶';}});$('player').classList.toggle('show',!!tr);}
         function renderLyrics(){
             const wrap=$('lyricsScroll');
             wrap.innerHTML='';
@@ -1303,7 +1300,7 @@
         }
 
         function setup(){
-            dom.audio=$('audio');dom.searchInput=$('searchInput');dom.playBtn=$('playBtn');dom.playPauseBtn=$('playPauseBtn');dom.nextBtn=$('nextBtn');dom.progressBar=$('progressBar');dom.progressWrapper=$('progressWrapper');dom.progressHandle=$('progressHandle');dom.menuBtn=$('menuBtn');dom.fullPlayerMask=$('fullPlayerMask');dom.fullPlayerPanel=$('fullPlayerPanel');dom.fullPlayerClose=$('fullPlayerClose');dom.fullCover=$('fullCover');dom.fullPlayBtn=$('fullPlayBtn');dom.fullPrevBtn=$('fullPrevBtn');dom.fullNextBtn=$('fullNextBtn');dom.fullFavBtn=$('fullFavBtn');dom.fullModeBtn=$('fullModeBtn');dom.fullDownloadBtn=$('fullDownloadBtn');dom.fullLyricsBtn=$('fullLyricsBtn');dom.fullVolumeBtn=$('fullVolumeBtn');dom.fullProgressWrapper=$('fullProgressWrapper');dom.fullProgressBar=$('fullProgressBar');dom.fullProgressHandle=$('fullProgressHandle');dom.favBtn=$('favBtn');dom.fullListBtn=$('fullListBtn');
+            dom.audio=$('audio');dom.searchInput=$('searchInput');dom.playPauseBtn=$('playPauseBtn');dom.nextBtn=$('nextBtn');dom.progressBar=$('progressBar');dom.progressWrapper=$('progressWrapper');dom.progressHandle=$('progressHandle');dom.menuBtn=$('menuBtn');dom.fullPlayerMask=$('fullPlayerMask');dom.fullPlayerPanel=$('fullPlayerPanel');dom.fullPlayerClose=$('fullPlayerClose');dom.fullCover=$('fullCover');dom.fullPlayBtn=$('fullPlayBtn');dom.fullPrevBtn=$('fullPrevBtn');dom.fullNextBtn=$('fullNextBtn');dom.fullFavBtn=$('fullFavBtn');dom.fullModeBtn=$('fullModeBtn');dom.fullDownloadBtn=$('fullDownloadBtn');dom.fullLyricsBtn=$('fullLyricsBtn');dom.fullVolumeBtn=$('fullVolumeBtn');dom.fullProgressWrapper=$('fullProgressWrapper');dom.fullProgressBar=$('fullProgressBar');dom.fullProgressHandle=$('fullProgressHandle');dom.favBtn=$('favBtn');dom.fullListBtn=$('fullListBtn');
 
             dom.searchInput.addEventListener('keydown',e=>{if(e.key==='Enter'){state.keyword=dom.searchInput.value.trim();searchAll(true);$('searchHistory').classList.remove('show');}});
             $('searchIcon').addEventListener('click',()=>{state.keyword=dom.searchInput.value.trim();searchAll(true);$('searchHistory').classList.remove('show');});
@@ -1316,7 +1313,6 @@
             $('qualitySelect').addEventListener('change',()=>{state.quality=$('qualitySelect').value;saveData();toast(`音质已切换至${state.quality==='lossless'?'无损':state.quality==='high'?'高品质':'标准'}`);if(state.keyword){searchAll(true);}else{loadDefault();}});
             document.querySelectorAll('.tab').forEach(tab=>tab.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t===tab));renderList();}));
 
-            dom.playBtn.addEventListener('click',async(e)=>{if(!state.current)return;if(state.current.url){if(dom.audio.paused){dom.audio.play();state.playing=true;}else{dom.audio.pause();state.playing=false;}updateUI();}else{await playTrack(state.current,e.target);}});
             dom.playPauseBtn.addEventListener('click',async(e)=>{if(!state.current)return;if(state.current.url){if(dom.audio.paused){dom.audio.play();state.playing=true;}else{dom.audio.pause();state.playing=false;}updateUI();}else{await playTrack(state.current,e.target);}});
             dom.nextBtn.addEventListener('click',()=>nextTrack('next'));
             dom.favBtn.addEventListener('click',toggleFav);
@@ -1517,7 +1513,7 @@
             document.addEventListener('keydown',e=>{
                 const tag=document.activeElement.tagName.toLowerCase();
                 const typing=(tag==='input'||tag==='textarea');
-                if(e.code==='Space'&&!typing){e.preventDefault();if(dom.playPauseBtn)dom.playPauseBtn.click();else dom.playBtn.click();}
+                if(e.code==='Space'&&!typing){e.preventDefault();if(dom.playPauseBtn)dom.playPauseBtn.click();}
                 if(e.key==='ArrowRight'&&!typing){dom.audio.currentTime=(dom.audio.currentTime||0)+5;}
                 if(e.key==='ArrowLeft'&&!typing){dom.audio.currentTime=Math.max(0,(dom.audio.currentTime||0)-5);}
                 if(e.key==='ArrowUp'&&!typing){dom.audio.volume=Math.min(1,(dom.audio.volume||0)+0.05);if($('volumeSlider'))$('volumeSlider').value=dom.audio.volume;updateVolumeDisplay();}
