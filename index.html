@@ -896,7 +896,7 @@
             height: 1em !important;
             flex-shrink: 0 !important;
             display: inline-block !important;
-            transition: none !important;
+            transition: opacity 0.2s ease !important;
             opacity: 1 !important;
         }
 
@@ -1339,9 +1339,13 @@
                         btn.textContent=kw;btn.onclick=()=>{$('searchInput').value=kw;state.keyword=kw;searchAll(true);};wrap.appendChild(btn);
                     });
                 }
+                // 渲染图标
+                setTimeout(()=>renderIconsOptimized(),10);
                 return;
             }
             list.forEach((tr,idx)=>{const row=document.createElement('div');row.className='track';const srcTag=tr.source==='migu'?'咪咕':tr.source==='netease'?'网易云':tr.source==='qq'?'QQ':'酷我';row.innerHTML=`<div class="index">${idx+1}</div><img class="cover" src="${tr.cover||''}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" onload="this.style.display='block';this.nextElementSibling.style.display='none'"><div class="cover-placeholder" style="width:48px;height:48px;border-radius:6px;background:linear-gradient(135deg,rgba(255,205,50,.15),rgba(255,183,77,.15));display:${tr.cover?'none':'flex'};margin-right:12px;flex-shrink:0;align-items:center;justify-content:center;color:var(--accent);font-size:22px;box-shadow:0 2px 6px rgba(255,205,50,.2);"><i data-lucide="music"></i></div><div class="info"><div class="title">${tr.title||'Unknown'}</div><div class="artist"><span class="source-tag source-${tr.source}">${srcTag}</span>${tr.singer||''}</div></div><button class="playbtn"><i data-lucide="play"></i></button>`;const playBtn=row.querySelector('.playbtn');playBtn.onclick=async(e)=>{e.stopPropagation();if(state.current&&state.current.uid===tr.uid&&state.current.url){if(dom.audio.paused){dom.audio.play();state.playing=true;}else{dom.audio.pause();state.playing=false;}updateUI();}else{await playTrack(tr,playBtn);}};row.onclick=()=>playBtn.click();wrap.appendChild(row);});
+            // 渲染图标
+            setTimeout(()=>renderIconsOptimized(),10);
         }
         async function playTrack(track, clickedBtn){
             // 显示加载状态
@@ -2128,12 +2132,20 @@
                     isRenderingIcons = true;
                     const newIcons = document.querySelectorAll('i[data-lucide]:not([data-rendered])');
                     if (newIcons.length > 0) {
+                        // 先设置透明度为0，然后渲染图标
+                        newIcons.forEach(icon => icon.style.opacity = '0');
                         lucide.createIcons();
-                        newIcons.forEach(icon => icon.setAttribute('data-rendered', 'true'));
+                        // 渲染后渐显图标
+                        setTimeout(() => {
+                            newIcons.forEach(icon => {
+                                icon.setAttribute('data-rendered', 'true');
+                                icon.style.opacity = '1';
+                            });
+                        }, 10);
                     }
                     isRenderingIcons = false;
                 }
-            }, 100); // 增加延迟，减少频繁调用
+            }, 50);
         }
 
         document.addEventListener('DOMContentLoaded',()=>{
