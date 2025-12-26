@@ -1173,8 +1173,8 @@
         };
 
         // 本地存储
-        function saveData(){localStorage.setItem('musicbox',JSON.stringify({favorites:state.favorites,history:state.history,searchHistory:state.searchHistory,enabledSources:state.enabledSources,mode:state.mode,volume:state.volume,quality:state.quality,perLimit:state.perLimit,appStyle:state.appStyle,lyricsStyle:state.lyricsStyle}));}
-        function loadData(){try{const d=JSON.parse(localStorage.getItem('musicbox')||'{}');Object.assign(state,d);if(!state.history)state.history=[];if(!state.searchHistory)state.searchHistory=[];if(!state.quality)state.quality='high';if(!state.perLimit)state.perLimit=20;if(state.appStyle===undefined)state.appStyle=0;if(state.lyricsStyle===undefined)state.lyricsStyle=0;}catch(e){}}
+        function saveData(){localStorage.setItem('musicbox',JSON.stringify({favorites:state.favorites,history:state.history,searchHistory:state.searchHistory,enabledSources:state.enabledSources,mode:state.mode,volume:state.volume,quality:state.quality,perLimit:state.perLimit,appStyle:state.appStyle}));}
+        function loadData(){try{const d=JSON.parse(localStorage.getItem('musicbox')||'{}');Object.assign(state,d);if(!state.history)state.history=[];if(!state.searchHistory)state.searchHistory=[];if(!state.quality)state.quality='high';if(!state.perLimit)state.perLimit=20;if(state.appStyle===undefined)state.appStyle=0;}catch(e){}}
         const dom={};
         function $(id){return document.getElementById(id);}
         function toast(msg){
