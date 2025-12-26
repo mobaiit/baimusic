@@ -935,14 +935,6 @@
             display:block;
             opacity:1;
         }
-        
-        /* 图标固定尺寸，防止变化时影响布局 */
-        svg[data-lucide], i[data-lucide] {
-            width: 1em !important;
-            height: 1em !important;
-            flex-shrink: 0 !important;
-            display: inline-block !important;
-        }
 
         /* 图标固定尺寸，防止变化时影响布局 */
         svg[data-lucide], i[data-lucide] {
@@ -950,6 +942,24 @@
             height: 1em !important;
             flex-shrink: 0 !important;
             display: inline-block !important;
+            transition: none !important;
+        }
+        
+        /* 防止图标渲染时闪烁 */
+        .player, .searchbar {
+            will-change: auto;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        
+        /* 图标容器稳定性 */
+        .player .controls button,
+        .searchbar .icon {
+            min-width: 32px;
+            min-height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 </head>
@@ -2021,7 +2031,7 @@
                     }
                     updateUI();
                     $('lyricsPlayBtn').innerHTML = state.playing ? '<i data-lucide="pause"></i>' : '<i data-lucide="play"></i>';
-                    setTimeout(()=>lucide.createIcons(),10);
+                    renderIconsOptimized();
                 }else{
                     await playTrack(state.current,e.target);
                 }
@@ -2076,8 +2086,8 @@
             $('qualitySelect').value=state.quality;
             dom.audio.volume=state.volume;
             $('fullMuteBtn').innerHTML=state.muted?'<i data-lucide="volume-x"></i>':'<i data-lucide="volume-2"></i>';
-            setTimeout(()=>lucide.createIcons(),10);
             updateModeUI();
+            
             // 初始化图标一次
             if(typeof lucide !== 'undefined'){
                 lucide.createIcons();
@@ -2085,6 +2095,18 @@
 
             loadDefault();
         }
+        
+        // 优化图标渲染，避免频繁重新创建
+        let iconRenderTimeout;
+        function renderIconsOptimized() {
+            if (iconRenderTimeout) clearTimeout(iconRenderTimeout);
+            iconRenderTimeout = setTimeout(() => {
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            }, 50);
+        }
+        
         document.addEventListener('DOMContentLoaded',()=>{
             setup();
             if(typeof lucide !== 'undefined'){
@@ -2092,7 +2114,7 @@
                 const originalRenderList = renderList;
                 renderList = function(){
                     originalRenderList();
-                    requestAnimationFrame(()=>lucide.createIcons());
+                    renderIconsOptimized();
                 };
             }
         });
