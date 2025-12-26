@@ -1074,7 +1074,7 @@
                 <div id="lyricsTitle" class="full-title">--</div>
                 <div id="lyricsArtist" class="full-artist">--</div>
             </div>
-            <button id="lyricsStyleBtn" class="close-btn"><i data-lucide="palette"></i></button>
+            <div style="width:40px;"></div>
         </div>
         <div id="lyricsScroll" class="lyrics-scroll-full"></div>
         <div class="lyrics-controls">
@@ -1728,11 +1728,12 @@
                 const body = document.body;
                 const fullPlayerPanel = $('fullPlayerPanel');
                 const playlistView = $('playlistView');
+                const lyricsView = $('lyricsView');
                 const styles = ['', 'alt-style', 'alt-style-1', 'alt-style-2', 'alt-style-3', 'alt-style-4', 'alt-style-5'];
                 const names = ['默认风格', 'Spotify风格', 'Apple Music风格', 'YouTube Music风格', 'Tidal风格', '网易云风格', 'QQ音乐风格'];
-                styles.forEach(style => {if(style) {app.classList.remove(style);body.classList.remove(style);fullPlayerPanel.classList.remove(style);playlistView.classList.remove(style);}});
+                styles.forEach(style => {if(style) {app.classList.remove(style);body.classList.remove(style);fullPlayerPanel.classList.remove(style);playlistView.classList.remove(style);lyricsView.classList.remove(style);}});
                 state.appStyle = (state.appStyle + 1) % styles.length;
-                if(styles[state.appStyle]) {app.classList.add(styles[state.appStyle]);body.classList.add(styles[state.appStyle]);fullPlayerPanel.classList.add(styles[state.appStyle]);playlistView.classList.add(styles[state.appStyle]);}
+                if(styles[state.appStyle]) {app.classList.add(styles[state.appStyle]);body.classList.add(styles[state.appStyle]);fullPlayerPanel.classList.add(styles[state.appStyle]);playlistView.classList.add(styles[state.appStyle]);lyricsView.classList.add(styles[state.appStyle]);}
                 saveData();
                 toast(`切换到${names[state.appStyle]}`);
             });
@@ -1757,7 +1758,7 @@
             dom.fullDownloadBtn.addEventListener('click',()=>downloadTrack(state.current));
             $('fullLyricsBtn').addEventListener('click',()=>{
                 if(window.innerWidth >= 768) {
-                    // PC端切换歌词样式
+                    // PC端切换歌词样式 - 使用主风格
                     const fullPlayerPanel = $('fullPlayerPanel');
                     const styles = ['', 'alt-style', 'alt-style-1', 'alt-style-2', 'alt-style-3', 'alt-style-4', 'alt-style-5'];
                     const names = ['默认样式', 'Spotify风格', 'Apple Music风格', 'YouTube Music风格', 'Tidal风格', '网易云风格', 'QQ音乐风格'];
@@ -1767,14 +1768,12 @@
                         if(style) fullPlayerPanel.classList.remove(style);
                     });
 
-                    // 切换到下一个样式
-                    state.lyricsStyle = (state.lyricsStyle + 1) % styles.length;
-                    if(styles[state.lyricsStyle]) {
-                        fullPlayerPanel.classList.add(styles[state.lyricsStyle]);
+                    // 使用主风格设置
+                    if(styles[state.appStyle]) {
+                        fullPlayerPanel.classList.add(styles[state.appStyle]);
                     }
 
-                    toast(`切换到${names[state.lyricsStyle]}`);
-                    saveData();
+                    toast(`已应用${names[state.appStyle]}`);
                 } else {
                     // 手机端显示歌词页面
                     showLyrics();
@@ -1878,26 +1877,7 @@
                 }
             });
 
-            // 歌词样式切换
-            $('lyricsStyleBtn').addEventListener('click', () => {
-                const lyricsView = $('lyricsView');
-                const styles = ['', 'alt-style', 'alt-style-1', 'alt-style-2', 'alt-style-3', 'alt-style-4', 'alt-style-5'];
-                const names = ['默认样式', 'Spotify风格', 'Apple Music风格', 'YouTube Music风格', 'Tidal风格', '网易云风格', 'QQ音乐风格'];
 
-                // 移除所有样式类
-                styles.forEach(style => {
-                    if(style) lyricsView.classList.remove(style);
-                });
-
-                // 切换到下一个样式
-                state.lyricsStyle = (state.lyricsStyle + 1) % styles.length;
-                if(styles[state.lyricsStyle]) {
-                    lyricsView.classList.add(styles[state.lyricsStyle]);
-                }
-
-                toast(`切换到${names[state.lyricsStyle]}`);
-                saveData();
-            });
 
             // 进度条拖动功能（鼠标和触摸）
             let progressDragging = false;
@@ -2076,9 +2056,7 @@
                 body.classList.add(styles[state.appStyle]);
                 fullPlayerPanel.classList.add(styles[state.appStyle]);
                 playlistView.classList.add(styles[state.appStyle]);
-            }
-            if(styles[state.lyricsStyle]) {
-                lyricsView.classList.add(styles[state.lyricsStyle]);
+                lyricsView.classList.add(styles[state.appStyle]);
             }
 
             // 初始化图标一次
