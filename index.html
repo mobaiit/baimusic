@@ -1052,7 +1052,8 @@
             selectedTracks:[],
             batchMode:false,
             quality:'high',
-            appStyle:0
+            appStyle:0,
+            currentHistoryIndex:-1
         };
 
         // 删除失败歌曲的收藏和历史记录
@@ -1288,6 +1289,8 @@
                                 e.stopPropagation();
                                 // 防止重复点击
                                 if(playBtn.innerHTML.includes('loader-2')) return;
+                                // 设置当前播放上下文为完整历史列表
+                                state.currentHistoryIndex = idx;
                                 await playTrack(tr, playBtn);
                             };
                             row.onclick=()=>{
@@ -1695,17 +1698,27 @@
 
             const tab=document.querySelector('.tab.active').dataset.tab;
             let list=[];
-            if(tab==='results')list=state.results;
-            else if(tab==='favorites')list=state.favorites;
-            else if(tab==='playlists')list=state.history;
+            let currentIndex = -1;
+            
+            if(tab==='results'){
+                list=state.results;
+                currentIndex=list.findIndex(t=>t.uid===state.current?.uid);
+            }
+            else if(tab==='favorites'){
+                list=state.favorites;
+                currentIndex=list.findIndex(t=>t.uid===state.current?.uid);
+            }
+            else if(tab==='playlists'){
+                list=state.history;
+                currentIndex=state.currentHistoryIndex>=0?state.currentHistoryIndex:list.findIndex(t=>t.uid===state.current?.uid);
+            }
             
             if(!list.length){
                 toast('播放列表为空');
                 return;
             }
             
-            let idx=list.findIndex(t=>t.uid===state.current?.uid);
-            if(idx<0)idx=0;
+            if(currentIndex<0)currentIndex=0;
             
             if(state.mode==='single'){
                 if(state.current && state.current.url) {
@@ -1718,20 +1731,23 @@
             }
             
             if(state.mode==='shuffle'){
-                if(list.length===1)idx=0;
+                if(list.length===1)currentIndex=0;
                 else{
                     let n;
                     do{
                         n=Math.floor(Math.random()*list.length);
-                    }while(n===idx && list.length > 1);
-                    idx=n;
+                    }while(n===currentIndex && list.length > 1);
+                    currentIndex=n;
                 }
             }else{
-                idx=(idx+(dir==='prev'?-1:1)+list.length)%list.length;
+                currentIndex=(currentIndex+(dir==='prev'?-1:1)+list.length)%list.length;
             }
             
-            const nextTrack = list[idx];
+            const nextTrack = list[currentIndex];
             if(nextTrack && nextTrack.uid) {
+                if(tab==='playlists'){
+                    state.currentHistoryIndex = currentIndex;
+                }
                 playTrack(nextTrack);
             } else {
                 toast('下一首歌曲信息不完整');
