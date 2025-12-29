@@ -81,6 +81,16 @@
         @keyframes spin{to{transform:translateY(-50%) rotate(360deg);}}
         .animate-spin{animation:spin-icon 1s linear infinite;}
         @keyframes spin-icon{to{transform:rotate(360deg);}}
+        
+        /* 优化的淡入动画 */
+        .fade-in {
+            animation: fadeIn 0.3s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
         /* 搜索历史 */
         .search-history{flex-shrink:0;padding:8px 16px;background:var(--panel);border-bottom:1px solid var(--border);display:none;}
@@ -714,21 +724,49 @@
             position: absolute;
         }
 
-        /* 禁用所有动画和过渡效果 */
-        *, *::before, *::after {
-            animation-duration: 0s !important;
-            animation-delay: 0s !important;
-            transition-duration: 0s !important;
-            transition-delay: 0s !important;
+        /* 优化动画 - 只使用 transform 和 opacity 避免重排重绘 */
+        .track, .tab, .player .controls button {
+            transition: transform 0.15s ease, opacity 0.15s ease;
         }
-
+        
+        .track:hover {
+            transform: translateX(2px);
+        }
+        
+        .player .controls button:active,
+        .control-btn:active,
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .full-player-panel {
+            transition: transform .3s cubic-bezier(.4,0,.2,1);
+        }
+        
+        .lyrics-view {
+            transition: transform .25s cubic-bezier(.4,0,.2,1);
+        }
+        
+        .lyrics-mask {
+            transition: opacity .2s ease;
+        }
+        
+        .progress .handle {
+            transition: opacity .15s ease;
+        }
+        
         /* 保留必要的动画 */
         .loading {
-            animation: spin .6s linear infinite !important;
+            animation: spin .6s linear infinite;
         }
         
         .rotating-cover:not(.paused) {
-            animation: rotate 20s linear infinite !important;
+            animation: rotate 20s linear infinite;
+        }
+        
+        .lyrics-scroll-full div,
+        .inline-lyrics div {
+            transition: transform .2s ease, color .2s ease, font-size .2s ease;
         }
     </style>
 </head>
@@ -997,6 +1035,14 @@
             }
         }
 
+        // 优化的DOM操作 - 批量更新减少重排
+        function batchDOMUpdate(callback) {
+            requestAnimationFrame(() => {
+                callback();
+                renderIconsOptimized();
+            });
+        }
+
         // 加载默认网易云推荐
         async function loadDefault(){
             if(state.keyword) return;
@@ -1095,43 +1141,45 @@
             }
         }
         function renderList(){
-            const wrap=$('scroll');wrap.innerHTML='';const tab=document.querySelector('.tab.active').dataset.tab;let list=[];
-            if(tab==='results')list=state.results;
-            else if(tab==='favorites')list=state.favorites;
-            else if(tab==='playlists'){
-                if(state.history.length){
-                    const headerDiv=document.createElement('div');
-                    headerDiv.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:10px 0;';
-                    headerDiv.innerHTML='<span style="color:var(--text-sub);font-size:14px;">播放历史</span><button id="clearHistoryBtn" style="padding:4px 8px;border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,.1);color:var(--text-sub);font-size:12px;cursor:pointer;">清空历史</button>';
-                    wrap.appendChild(headerDiv);
-                    state.history.slice(0,20).forEach((tr,idx)=>{
-                        const row=document.createElement('div');row.className='track';const srcTag=tr.source==='migu'?'咪咕':tr.source==='netease'?'网易云':tr.source==='qq'?'QQ':'酷我';
-                        row.innerHTML=`<div class="index">${idx+1}</div><img class="cover" src="${tr.cover||''}" style="display:${tr.cover?'block':'none'}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" onload="this.style.display='block';this.nextElementSibling.style.display='none'"><div class="cover-placeholder" style="width:48px;height:48px;border-radius:6px;background:linear-gradient(135deg,rgba(255,205,50,.15),rgba(255,183,77,.15));display:${tr.cover?'none':'flex'};margin-right:12px;flex-shrink:0;align-items:center;justify-content:center;color:var(--accent);font-size:22px;box-shadow:0 2px 6px rgba(255,205,50,.2);"><i data-lucide="music"></i></div><div class="info"><div class="title">${tr.title||'Unknown'}</div><div class="artist"><span class="source-tag source-${tr.source}">${srcTag}</span>${tr.singer||''}</div></div><button class="playbtn"><i data-lucide="play"></i></button>`;
-                        row.querySelector('.playbtn').onclick=async(e)=>{window.event=e;await playTrack(tr);};row.onclick=()=>row.querySelector('.playbtn').click();wrap.appendChild(row);
-                    });
-                    // 添加清空历史按钮事件
-                    const clearBtn=document.getElementById('clearHistoryBtn');
-                    if(clearBtn){
-                        clearBtn.onclick=()=>{
-                            if(confirm('确定要清空所有播放历史吗？')){
-                                state.history=[];
-                                saveData();
-                                renderList();
-                                toast('播放历史已清空');
-                            }
-                        };
+            batchDOMUpdate(() => {
+                const wrap=$('scroll');wrap.innerHTML='';const tab=document.querySelector('.tab.active').dataset.tab;let list=[];
+                if(tab==='results')list=state.results;
+                else if(tab==='favorites')list=state.favorites;
+                else if(tab==='playlists'){
+                    if(state.history.length){
+                        const headerDiv=document.createElement('div');
+                        headerDiv.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:10px 0;';
+                        headerDiv.innerHTML='<span style="color:var(--text-sub);font-size:14px;">播放历史</span><button id="clearHistoryBtn" style="padding:4px 8px;border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,.1);color:var(--text-sub);font-size:12px;cursor:pointer;">清空历史</button>';
+                        wrap.appendChild(headerDiv);
+                        state.history.slice(0,20).forEach((tr,idx)=>{
+                            const row=document.createElement('div');row.className='track fade-in';const srcTag=tr.source==='migu'?'咪咕':tr.source==='netease'?'网易云':tr.source==='qq'?'QQ':'酷我';
+                            row.innerHTML=`<div class="index">${idx+1}</div><img class="cover" src="${tr.cover||''}" style="display:${tr.cover?'block':'none'}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" onload="this.style.display='block';this.nextElementSibling.style.display='none'"><div class="cover-placeholder" style="width:48px;height:48px;border-radius:6px;background:linear-gradient(135deg,rgba(255,205,50,.15),rgba(255,183,77,.15));display:${tr.cover?'none':'flex'};margin-right:12px;flex-shrink:0;align-items:center;justify-content:center;color:var(--accent);font-size:22px;box-shadow:0 2px 6px rgba(255,205,50,.2);"><i data-lucide="music"></i></div><div class="info"><div class="title">${tr.title||'Unknown'}</div><div class="artist"><span class="source-tag source-${tr.source}">${srcTag}</span>${tr.singer||''}</div></div><button class="playbtn"><i data-lucide="play"></i></button>`;
+                            row.querySelector('.playbtn').onclick=async(e)=>{window.event=e;await playTrack(tr);};row.onclick=()=>row.querySelector('.playbtn').click();wrap.appendChild(row);
+                        });
+                        // 添加清空历史按钮事件
+                        const clearBtn=document.getElementById('clearHistoryBtn');
+                        if(clearBtn){
+                            clearBtn.onclick=()=>{
+                                if(confirm('确定要清空所有播放历史吗？')){
+                                    state.history=[];
+                                    saveData();
+                                    renderList();
+                                    toast('播放历史已清空');
+                                }
+                            };
+                        }
                     }
+                    if(state.searchHistory.length){
+                        const histDiv=document.createElement('div');histDiv.style.cssText='padding:20px 0 10px;color:var(--text-sub);font-size:14px;';histDiv.textContent='搜索历史';wrap.appendChild(histDiv);
+                        state.searchHistory.forEach(kw=>{
+                            const btn=document.createElement('button');btn.style.cssText='margin:4px 8px 4px 0;padding:4px 12px;border:1px solid var(--border);border-radius:16px;background:rgba(255,255,255,.1);color:var(--text-main);font-size:12px;cursor:pointer;';
+                            btn.textContent=kw;btn.onclick=()=>{$('searchInput').value=kw;state.keyword=kw;searchAll(true);};wrap.appendChild(btn);
+                        });
+                    }
+                    return;
                 }
-                if(state.searchHistory.length){
-                    const histDiv=document.createElement('div');histDiv.style.cssText='padding:20px 0 10px;color:var(--text-sub);font-size:14px;';histDiv.textContent='搜索历史';wrap.appendChild(histDiv);
-                    state.searchHistory.forEach(kw=>{
-                        const btn=document.createElement('button');btn.style.cssText='margin:4px 8px 4px 0;padding:4px 12px;border:1px solid var(--border);border-radius:16px;background:rgba(255,255,255,.1);color:var(--text-main);font-size:12px;cursor:pointer;';
-                        btn.textContent=kw;btn.onclick=()=>{$('searchInput').value=kw;state.keyword=kw;searchAll(true);};wrap.appendChild(btn);
-                    });
-                }
-                return;
-            }
-            list.forEach((tr,idx)=>{const row=document.createElement('div');row.className='track';const srcTag=tr.source==='migu'?'咪咕':tr.source==='netease'?'网易云':tr.source==='qq'?'QQ':'酷我';row.innerHTML=`<div class="index">${idx+1}</div><img class="cover" src="${tr.cover||''}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" onload="this.style.display='block';this.nextElementSibling.style.display='none'"><div class="cover-placeholder" style="width:48px;height:48px;border-radius:6px;background:linear-gradient(135deg,rgba(255,205,50,.15),rgba(255,183,77,.15));display:${tr.cover?'none':'flex'};margin-right:12px;flex-shrink:0;align-items:center;justify-content:center;color:var(--accent);font-size:22px;box-shadow:0 2px 6px rgba(255,205,50,.2);"><i data-lucide="music"></i></div><div class="info"><div class="title">${tr.title||'Unknown'}</div><div class="artist"><span class="source-tag source-${tr.source}">${srcTag}</span>${tr.singer||''}</div></div><button class="playbtn"><i data-lucide="play"></i></button>`;const playBtn=row.querySelector('.playbtn');playBtn.onclick=async(e)=>{e.stopPropagation();if(state.current&&state.current.uid===tr.uid&&state.current.url){if(dom.audio.paused){dom.audio.play();state.playing=true;}else{dom.audio.pause();state.playing=false;}updateUI();}else{await playTrack(tr,playBtn);}};row.onclick=()=>playBtn.click();wrap.appendChild(row);});
+                list.forEach((tr,idx)=>{const row=document.createElement('div');row.className='track fade-in';const srcTag=tr.source==='migu'?'咪咕':tr.source==='netease'?'网易云':tr.source==='qq'?'QQ':'酷我';row.innerHTML=`<div class="index">${idx+1}</div><img class="cover" src="${tr.cover||''}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" onload="this.style.display='block';this.nextElementSibling.style.display='none'"><div class="cover-placeholder" style="width:48px;height:48px;border-radius:6px;background:linear-gradient(135deg,rgba(255,205,50,.15),rgba(255,183,77,.15));display:${tr.cover?'none':'flex'};margin-right:12px;flex-shrink:0;align-items:center;justify-content:center;color:var(--accent);font-size:22px;box-shadow:0 2px 6px rgba(255,205,50,.2);"><i data-lucide="music"></i></div><div class="info"><div class="title">${tr.title||'Unknown'}</div><div class="artist"><span class="source-tag source-${tr.source}">${srcTag}</span>${tr.singer||''}</div></div><button class="playbtn"><i data-lucide="play"></i></button>`;const playBtn=row.querySelector('.playbtn');playBtn.onclick=async(e)=>{e.stopPropagation();if(state.current&&state.current.uid===tr.uid&&state.current.url){if(dom.audio.paused){dom.audio.play();state.playing=true;}else{dom.audio.pause();state.playing=false;}updateUI();}else{await playTrack(tr,playBtn);}};row.onclick=()=>playBtn.click();wrap.appendChild(row);});
+            });
         }
         async function playTrack(track, clickedBtn){
             // 显示加载状态
