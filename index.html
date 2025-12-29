@@ -193,6 +193,10 @@
         .close-btn{
             width:40px;
             height:40px;
+            min-width:40px;
+            min-height:40px;
+            max-width:40px;
+            max-height:40px;
             border-radius:50%;
             background:rgba(255,255,255,.1);
             border:none;
@@ -201,6 +205,8 @@
             display:flex;
             align-items:center;
             justify-content:center;
+            flex-shrink:0;
+            contain:layout;
         }
         .full-player-song-info{
             text-align:center;
@@ -228,6 +234,10 @@
             transform:translateY(-50%);
             width:40px;
             height:40px;
+            min-width:40px;
+            min-height:40px;
+            max-width:40px;
+            max-height:40px;
             border-radius:50%;
             border:none;
             background:rgba(255,255,255,.1);
@@ -236,7 +246,9 @@
             display:flex;
             align-items:center;
             justify-content:center;
-            transition:all .2s;
+            transition:transform .15s ease;
+            flex-shrink:0;
+            contain:layout;
         }
         .full-player-fav-btn:active{
             transform:translateY(-50%) scale(0.95);
@@ -397,33 +409,70 @@
             display:flex;
             align-items:center;
             justify-content:center;
-            gap:24px;
-            padding:0 24px;
+            gap:16px;
+            padding:0 20px;
             margin-bottom:24px;
+            min-height:80px;
         }
         .control-btn{
-            width:56px;
-            height:56px;
+            width:48px;
+            height:48px;
+            min-width:48px;
+            min-height:48px;
+            max-width:48px;
+            max-height:48px;
             border-radius:50%;
             border:none;
             background:rgba(255,255,255,.1);
             color:var(--text-main);
-            font-size:24px;
+            font-size:20px;
             display:flex;
             align-items:center;
             justify-content:center;
-            transition:all .2s;
+            transition:transform .15s ease;
+            flex-shrink:0;
+            contain:layout;
         }
         .control-btn:active{
             transform:scale(0.95);
         }
         .play-btn{
-            width:72px;
-            height:72px;
+            width:64px;
+            height:64px;
+            min-width:64px;
+            min-height:64px;
+            max-width:64px;
+            max-height:64px;
             background:var(--accent);
             color:#000;
-            font-size:32px;
+            font-size:28px;
             box-shadow:0 4px 16px rgba(255,205,50,.4);
+        }
+        
+        /* 小屏幕优化 */
+        @media (max-width: 360px) {
+            .full-player-controls {
+                gap:12px;
+                padding:0 16px;
+            }
+            .control-btn {
+                width:44px;
+                height:44px;
+                min-width:44px;
+                min-height:44px;
+                max-width:44px;
+                max-height:44px;
+                font-size:18px;
+            }
+            .play-btn {
+                width:56px;
+                height:56px;
+                min-width:56px;
+                min-height:56px;
+                max-width:56px;
+                max-height:56px;
+                font-size:24px;
+            }
         }
 
         .lyrics-play-btn{
@@ -432,6 +481,10 @@
             right:30px;
             width:56px;
             height:56px;
+            min-width:56px;
+            min-height:56px;
+            max-width:56px;
+            max-height:56px;
             border-radius:50%;
             border:none;
             background:var(--accent);
@@ -442,6 +495,8 @@
             justify-content:center;
             box-shadow:0 4px 16px rgba(255,107,107,0.4);
             z-index:105;
+            flex-shrink:0;
+            contain:layout;
         }
 
         /* 播放列表视图 */
@@ -470,6 +525,10 @@
         .playlist-mode-btn{
             width:40px;
             height:40px;
+            min-width:40px;
+            min-height:40px;
+            max-width:40px;
+            max-height:40px;
             border-radius:50%;
             border:none;
             background:rgba(255,255,255,.1);
@@ -478,6 +537,8 @@
             display:flex;
             align-items:center;
             justify-content:center;
+            flex-shrink:0;
+            contain:layout;
         }
         .playlist-batch-controls{
             display:none;
@@ -646,6 +707,10 @@
                 transform: translateY(-50%);
                 width: 40px;
                 height: 40px;
+                min-width: 40px;
+                min-height: 40px;
+                max-width: 40px;
+                max-height: 40px;
                 border-radius: 50%;
                 border: none;
                 background: rgba(255,255,255,.1);
@@ -654,7 +719,9 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                transition: all .2s;
+                transition: transform .15s ease;
+                flex-shrink: 0;
+                contain: layout;
             }
             .pc-fav-btn:active {
                 transform: translateY(-50%) scale(0.95);
