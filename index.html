@@ -1202,7 +1202,7 @@
                         state.history.slice(0,20).forEach((tr,idx)=>{
                             const row=document.createElement('div');row.className='track fade-in';const srcTag=tr.source==='migu'?'咪咕':tr.source==='netease'?'网易云':tr.source==='qq'?'QQ':'酷我';
                             row.innerHTML=`<div class="index">${idx+1}</div><img class="cover" src="${tr.cover||''}" style="display:${tr.cover?'block':'none'}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" onload="this.style.display='block';this.nextElementSibling.style.display='none'"><div class="cover-placeholder" style="width:48px;height:48px;border-radius:6px;background:linear-gradient(135deg,rgba(255,205,50,.15),rgba(255,183,77,.15));display:${tr.cover?'none':'flex'};margin-right:12px;flex-shrink:0;align-items:center;justify-content:center;color:var(--accent);font-size:22px;box-shadow:0 2px 6px rgba(255,205,50,.2);"><i data-lucide="music"></i></div><div class="info"><div class="title">${tr.title||'Unknown'}</div><div class="artist"><span class="source-tag source-${tr.source}">${srcTag}</span>${tr.singer||''}</div></div><button class="playbtn"><i data-lucide="play"></i></button>`;
-                            row.querySelector('.playbtn').onclick=async(e)=>{window.event=e;await playTrack(tr);};row.onclick=()=>row.querySelector('.playbtn').click();wrap.appendChild(row);
+                            row.querySelector('.playbtn').onclick=async(e)=>{e.stopPropagation();await playTrack(tr);};row.onclick=()=>row.querySelector('.playbtn').click();wrap.appendChild(row);
                         });
                         // 添加清空历史按钮事件
                         const clearBtn=document.getElementById('clearHistoryBtn');
