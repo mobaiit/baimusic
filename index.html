@@ -832,7 +832,7 @@
     <!-- 顶部 -->
     <header class="topbar">
         <div class="logo">墨白音乐盒</div>
-        <div class="author">QQ: 37010871</div>
+        <div class="author">Q群: 19514933</div>
     </header>
 
     <!-- 版权声明 -->
@@ -1011,7 +1011,7 @@
             本站所有数据均系网友搜集自互联网后分享，仅供音乐爱好者交流使用。<br><br>
             音频版权归原网站及版权方所有，本站不提供任何音频存储和贩卖服务，支持购买正版音乐。<br><br>
             如内容侵犯您的权益，请通过以下方式联系我们删除：<br><br>
-            QQ: 37010871
+            Q群: 19514933
         </div>
         <button class="disclaimer-close" id="disclaimerClose">我知道了</button>
     </div>
@@ -1628,7 +1628,7 @@
             dom.playPauseBtn.addEventListener('click',async(e)=>{if(!state.current)return;if(state.current.url){if(dom.audio.paused){dom.audio.play();state.playing=true;}else{dom.audio.pause();state.playing=false;}updateUI();}else{dom.playPauseBtn.innerHTML='<i data-lucide="loader-2" class="animate-spin"></i>';setTimeout(()=>lucide.createIcons(),10);await playTrack(state.current);updateUI();}});
             dom.nextBtn.addEventListener('click',()=>{dom.playPauseBtn.innerHTML='<i data-lucide="loader-2" class="animate-spin"></i>';setTimeout(()=>lucide.createIcons(),10);nextTrack('next');setTimeout(()=>updateUI(),500);});
             dom.favBtn.addEventListener('click',toggleFav);
-            dom.menuBtn.addEventListener('click',()=>{dom.fullPlayerMask.classList.add('show');dom.fullPlayerPanel.classList.add('show');});
+            dom.menuBtn.addEventListener('click',()=>{dom.fullPlayerPanel.style.transform='';dom.fullPlayerMask.style.opacity='';dom.fullPlayerMask.classList.add('show');dom.fullPlayerPanel.classList.add('show');});
 
             // 全屏播放器下滑手势退出
             let fullPlayerStartY = 0;
@@ -1792,6 +1792,8 @@
             document.querySelector('.cover-wrapper').addEventListener('click',e=>e.stopPropagation());
             document.querySelector('.player').addEventListener('click',()=>{
                 if(!state.current)return;
+                dom.fullPlayerPanel.style.transform='';
+                dom.fullPlayerMask.style.opacity='';
                 dom.fullPlayerMask.classList.add('show');
                 dom.fullPlayerPanel.classList.add('show');
             });
@@ -1859,8 +1861,10 @@
             function closeFullPlayer(){
                 dom.fullPlayerMask.classList.remove('show');
                 dom.fullPlayerPanel.classList.remove('show');
-                dom.fullPlayerPanel.style.transform = 'translateY(100%)';
-                dom.fullPlayerMask.style.opacity = '0';
+                setTimeout(() => {
+                    dom.fullPlayerPanel.style.transform = '';
+                    dom.fullPlayerMask.style.opacity = '';
+                }, 300);
                 hideLyrics();
                 $('playlistView').style.display='none';
             }
