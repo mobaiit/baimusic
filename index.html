@@ -1635,14 +1635,14 @@
             let fullPlayerIsDragging = false;
             
             dom.fullPlayerPanel.addEventListener('touchstart', e => {
-                if (e.target.closest('.full-player-controls') || e.target.closest('.full-progress') || e.target.closest('#lyricsView')) return;
+                if (e.target.closest('.full-player-controls') || e.target.closest('.full-progress') || e.target.closest('#lyricsView') || e.target.closest('#playlistView')) return;
                 fullPlayerStartY = e.touches[0].clientY;
                 fullPlayerIsDragging = true;
             });
             
             dom.fullPlayerPanel.addEventListener('touchmove', e => {
                 if (!fullPlayerIsDragging) return;
-                if (e.target.closest('.full-player-controls') || e.target.closest('.full-progress') || e.target.closest('#lyricsView')) return;
+                if (e.target.closest('.full-player-controls') || e.target.closest('.full-progress') || e.target.closest('#lyricsView') || e.target.closest('#playlistView')) return;
                 const currentY = e.touches[0].clientY;
                 const diff = currentY - fullPlayerStartY;
                 if (diff > 0) {
