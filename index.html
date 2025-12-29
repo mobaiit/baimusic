@@ -1635,14 +1635,14 @@
             let fullPlayerIsDragging = false;
             
             dom.fullPlayerPanel.addEventListener('touchstart', e => {
-                if (e.target.closest('.full-player-controls') || e.target.closest('.full-progress')) return;
+                if (e.target.closest('.full-player-controls') || e.target.closest('.full-progress') || e.target.closest('#lyricsView')) return;
                 fullPlayerStartY = e.touches[0].clientY;
                 fullPlayerIsDragging = true;
             });
             
             dom.fullPlayerPanel.addEventListener('touchmove', e => {
                 if (!fullPlayerIsDragging) return;
-                if (e.target.closest('.full-player-controls') || e.target.closest('.full-progress')) return;
+                if (e.target.closest('.full-player-controls') || e.target.closest('.full-progress') || e.target.closest('#lyricsView')) return;
                 const currentY = e.touches[0].clientY;
                 const diff = currentY - fullPlayerStartY;
                 if (diff > 0) {
@@ -1691,27 +1691,25 @@
             let playlistIsDragging = false;
             
             $('playlistView').addEventListener('touchstart', e => {
-                if (e.target.closest('.playlist-controls')) return;
                 playlistStartX = e.touches[0].clientX;
                 playlistIsDragging = true;
             });
             
             $('playlistView').addEventListener('touchmove', e => {
                 if (!playlistIsDragging) return;
-                if (e.target.closest('.playlist-controls')) return;
                 const currentX = e.touches[0].clientX;
-                const diff = playlistStartX - currentX;
+                const diff = currentX - playlistStartX;
                 if (diff > 0) {
                     e.preventDefault();
                     const progress = Math.min(diff / 200, 1);
-                    $('playlistView').style.transform = `translateX(-${diff}px)`;
+                    $('playlistView').style.transform = `translateX(${diff}px)`;
                 }
             });
             
             $('playlistView').addEventListener('touchend', e => {
                 if (!playlistIsDragging) return;
                 const endX = e.changedTouches[0].clientX;
-                const diff = playlistStartX - endX;
+                const diff = endX - playlistStartX;
                 if (diff > 100) {
                     $('playlistView').style.display = 'none';
                     $('playlistView').style.transform = '';
