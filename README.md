@@ -2,7 +2,7 @@
 
 现代化在线音乐播放器，支持多平台音乐搜索与播放。
 
-👉 **Live URL:** <https://mobaiit.github.io/musicsquare/>
+👉 **Live URL:** <https://mobaiit.github.io/musicbox/>
 
 ## ✨ 主要功能
 
